@@ -75,5 +75,21 @@ def serve_index():
     return send_from_directory(os.path.dirname(__file__), "index.html")
 
 
+@app.route("/service-worker.js")
+def service_worker():
+    """
+    Serves the service worker from the SITE ROOT rather than /static/.
+    A service worker can only control pages at or below the URL path
+    it's served from — serving it from /static/ would limit it to
+    controlling only /static/ files, which breaks offline support for
+    everything else (the page itself, /api/medications, etc).
+    """
+    response = send_from_directory(
+        os.path.join(os.path.dirname(__file__), "static"), "service-worker.js"
+    )
+    response.headers["Service-Worker-Allowed"] = "/"
+    return response
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

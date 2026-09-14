@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FeedSafe — Quick medication check</title>
 
+<!-- PWA essentials: these three lines are what let a phone offer
+     "Add to Home Screen" / "Install app" for this page. -->
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#F3D6D6">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+
 <style>
   :root {
     --cream:        #FBF3E7;
@@ -161,38 +167,52 @@
     return `We don't have enough to say for sure yet — worth a quick call to your doctor about ${entry.generic_name}.`;
   }
 
+  // Holds the full medication list once loaded, so the app can search
+  // it instantly offline — no network call needed per keystroke.
+  let allMedications = [];
+
   /* ============================================================
-     Build the quick-choice pills from the live database, instead
-     of hardcoding four button tags in the HTML.
+     Load the full database ONCE on startup. The service worker
+     (registered below) has already cached this exact request, so
+     this works identically whether you're online or not.
      ============================================================ */
-  async function populatePills() {
+  async function loadDatabase() {
     try {
       const response = await fetch("/api/medications");
-      const allMeds = await response.json();
-
-      // Show the first four as quick-choice shortcuts; the search
-      // box still reaches every medication in the database.
-      allMeds.slice(0, 4).forEach((med) => {
-        const button = document.createElement("button");
-        button.className = "pill";
-        button.textContent = med.generic_name;
-        button.dataset.med = med.generic_name;
-        button.addEventListener("click", () => {
-          searchInput.value = med.generic_name;
-          showMedication(med.generic_name);
-        });
-        pillRow.appendChild(button);
-      });
+      allMedications = await response.json();
+      populatePills();
     } catch (err) {
       console.error("Could not load medication list:", err);
     }
   }
 
+  function populatePills() {
+    allMedications.slice(0, 4).forEach((med) => {
+      const button = document.createElement("button");
+      button.className = "pill";
+      button.textContent = med.generic_name;
+      button.addEventListener("click", () => {
+        searchInput.value = med.generic_name;
+        showMedication(med.generic_name);
+      });
+      pillRow.appendChild(button);
+    });
+  }
+
   /* ============================================================
-     Looks up a medication through the backend's /api/search route
-     (instead of an in-page array) and updates the card's state.
+     Searches the in-memory list — this is what makes lookups work
+     with zero network calls, so the installed app keeps working
+     with no signal at all.
      ============================================================ */
-  async function showMedication(rawQuery) {
+  function findMedication(rawQuery) {
+    const query = rawQuery.trim().toLowerCase();
+    return allMedications.find((med) => {
+      if (med.generic_name.toLowerCase() === query) return true;
+      return (med.brand_names || []).some((brand) => brand.toLowerCase() === query);
+    });
+  }
+
+  function showMedication(rawQuery) {
     const query = rawQuery.trim();
 
     if (query === "") {
@@ -200,37 +220,35 @@
       return;
     }
 
-    resultCard.className = "result-card state-loading";
+    const med = findMedication(query);
 
-    try {
-      const response = await fetch(`/api/search/${encodeURIComponent(query)}`);
-      const data = await response.json();
-
-      if (data.found) {
-        const med = data.medication;
-        resMedName.textContent    = med.generic_name;
-        resSentence.textContent   = sentenceForRiskLevel(med);
-        resConfidence.textContent = `Based on: ${med.risk_level}`;
-        resSource.innerHTML       = `Source: <a href="${med.source_url}" target="_blank" rel="noopener">NIH LactMed</a>`;
-        resultCard.className = "result-card state-result";
-      } else {
-        resultCard.className = "result-card state-notfound";
-      }
-    } catch (err) {
-      console.error("Search request failed:", err);
+    if (med) {
+      resMedName.textContent    = med.generic_name;
+      resSentence.textContent   = sentenceForRiskLevel(med);
+      resConfidence.textContent = `Based on: ${med.risk_level}`;
+      resSource.innerHTML       = `Source: <a href="${med.source_url}" target="_blank" rel="noopener">NIH LactMed</a>`;
+      resultCard.className = "result-card state-result";
+    } else {
       resultCard.className = "result-card state-notfound";
     }
   }
 
-  // Debounce typing slightly so we're not firing a request on every keystroke.
-  let debounceTimer;
   searchInput.addEventListener("input", (event) => {
-    clearTimeout(debounceTimer);
-    const value = event.target.value;
-    debounceTimer = setTimeout(() => showMedication(value), 250);
+    showMedication(event.target.value);
   });
 
-  populatePills();
+  loadDatabase();
+
+  /* ============================================================
+     Registers the service worker. This one call is what unlocks
+     "Add to Home Screen" / "Install app" and offline use — the
+     browser won't offer installation without it.
+     ============================================================ */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/service-worker.js");
+    });
+  }
 </script>
 
 </body>
