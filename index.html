@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FeedSafe — Quick medication check</title>
+
+<style>
+  :root {
+    --cream:        #FBF3E7;
+    --butter:       #F6E3A1;
+    --butter-deep:  #E8C767;
+    --pink:         #F3D6D6;
+    --pink-deep:    #E7B8BE;
+    --charcoal:     #33302B;
+    --charcoal-soft:#655F55;
+    --card-border:  #E9D9BE;
+    --focus-ring:   #B08968;
+    --white-soft:   #FFFDF9;
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-pill: 999px;
+    --shadow-soft: 0 8px 24px rgba(120, 96, 60, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .page { min-height: 100vh; display: flex; justify-content: center; padding: 32px 20px 60px; }
+  .container { width: 100%; max-width: 480px; }
+
+  header.app-header { text-align: left; margin-bottom: 28px; }
+  header.app-header h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 6px; font-weight: 700; letter-spacing: -0.01em; }
+  header.app-header p { margin: 0; color: var(--charcoal-soft); font-size: 0.98rem; line-height: 1.5; }
+
+  .search-wrap { margin-bottom: 16px; }
+  #searchInput {
+    width: 100%; font-size: 1.05rem; padding: 15px 18px;
+    border-radius: var(--radius-md); border: 1.5px solid var(--card-border);
+    background: var(--white-soft); color: var(--charcoal); outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  #searchInput::placeholder { color: #A79D89; }
+  #searchInput:focus, #searchInput:focus-visible {
+    border-color: var(--focus-ring);
+    box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.20);
+  }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+  .pill {
+    font-size: 0.92rem; font-weight: 600; padding: 9px 16px;
+    border-radius: var(--radius-pill); border: 1.5px solid var(--card-border);
+    background: var(--butter); color: var(--charcoal); cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  }
+  .pill:hover { background: var(--butter-deep); border-color: var(--butter-deep); }
+  .pill:active { transform: scale(0.97); }
+  .pill:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(176, 137, 104, 0.35); }
+
+  .result-card {
+    background: var(--pink); border: 1.5px solid var(--pink-deep);
+    border-radius: var(--radius-lg); padding: 28px 24px; min-height: 200px;
+    display: flex; align-items: center; box-shadow: var(--shadow-soft);
+  }
+  .card-block { display: none; width: 100%; }
+  .result-card.state-empty    .card-block.empty    { display: block; }
+  .result-card.state-result   .card-block.result   { display: block; }
+  .result-card.state-notfound .card-block.notfound { display: block; }
+  .result-card.state-loading  .card-block.loading  { display: block; }
+
+  .card-block.empty p, .card-block.loading p {
+    margin: 0; color: var(--charcoal-soft); font-size: 1.02rem; line-height: 1.55; text-align: center;
+  }
+
+  .med-name {
+    font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--charcoal-soft); margin: 0 0 10px;
+  }
+  .med-sentence { font-size: 1.28rem; line-height: 1.42; font-weight: 600; color: var(--charcoal); margin: 0 0 14px; }
+  .confidence-tag {
+    display: inline-block; font-size: 0.85rem; color: var(--charcoal-soft);
+    background: rgba(255, 253, 249, 0.55); padding: 5px 12px; border-radius: var(--radius-pill);
+  }
+  .source-link { display: block; margin-top: 12px; font-size: 0.78rem; }
+  .source-link a { color: var(--charcoal-soft); text-decoration: underline; }
+
+  .card-block.notfound p { margin: 0 0 14px; color: var(--charcoal); font-size: 1.05rem; line-height: 1.5; text-align: center; }
+  .card-block.notfound .cta { display: block; margin: 0 auto; font-size: 0.92rem; font-weight: 600; color: var(--charcoal-soft); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="container">
+
+    <header class="app-header">
+      <h1>Is it safe while breastfeeding?</h1>
+      <p>Type a medication name, or tap one below.</p>
+    </header>
+
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search a medication, e.g. Ibuprofen" autocomplete="off">
+    </div>
+
+    <!-- Quick-choice pills are now built from the real database at load time,
+         instead of being hardcoded — see populatePills() below. -->
+    <div class="pill-row" id="pillRow"></div>
+
+    <div class="result-card state-empty" id="resultCard" aria-live="polite">
+
+      <div class="card-block empty">
+        <p>Tap a quick-choice button or type a medication above to check its safety.</p>
+      </div>
+
+      <div class="card-block loading">
+        <p>Checking…</p>
+      </div>
+
+      <div class="card-block result">
+        <p class="med-name" id="resMedName"></p>
+        <p class="med-sentence" id="resSentence"></p>
+        <span class="confidence-tag" id="resConfidence"></span>
+        <span class="source-link" id="resSource"></span>
+      </div>
+
+      <div class="card-block notfound">
+        <p>We couldn't find that medication in our database yet.</p>
+        <span class="cta">When in doubt, a quick call to your doctor or pharmacist is always the safest move.</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const resultCard    = document.getElementById("resultCard");
+  const searchInput   = document.getElementById("searchInput");
+  const pillRow       = document.getElementById("pillRow");
+  const resMedName    = document.getElementById("resMedName");
+  const resSentence   = document.getElementById("resSentence");
+  const resConfidence = document.getElementById("resConfidence");
+  const resSource     = document.getElementById("resSource");
+
+  // A short, calming sentence per risk_level, so the card stays
+  // "sentence-first" even though the underlying data now comes from
+  // a real backend instead of hardcoded strings.
+  function sentenceForRiskLevel(entry) {
+    const level = entry.risk_level.toLowerCase();
+    if (level.startsWith("minimal risk")) {
+      return `You can take ${entry.generic_name} — it's considered a safe choice while breastfeeding.`;
+    }
+    if (level.startsWith("infant monitoring advised")) {
+      return `${entry.generic_name} is generally okay, but it's worth keeping an eye on your baby for any changes.`;
+    }
+    return `We don't have enough to say for sure yet — worth a quick call to your doctor about ${entry.generic_name}.`;
+  }
+
+  /* ============================================================
+     Build the quick-choice pills from the live database, instead
+     of hardcoding four button tags in the HTML.
+     ============================================================ */
+  async function populatePills() {
+    try {
+      const response = await fetch("/api/medications");
+      const allMeds = await response.json();
+
+      // Show the first four as quick-choice shortcuts; the search
+      // box still reaches every medication in the database.
+      allMeds.slice(0, 4).forEach((med) => {
+        const button = document.createElement("button");
+        button.className = "pill";
+        button.textContent = med.generic_name;
+        button.dataset.med = med.generic_name;
+        button.addEventListener("click", () => {
+          searchInput.value = med.generic_name;
+          showMedication(med.generic_name);
+        });
+        pillRow.appendChild(button);
+      });
+    } catch (err) {
+      console.error("Could not load medication list:", err);
+    }
+  }
+
+  /* ============================================================
+     Looks up a medication through the backend's /api/search route
+     (instead of an in-page array) and updates the card's state.
+     ============================================================ */
+  async function showMedication(rawQuery) {
+    const query = rawQuery.trim();
+
+    if (query === "") {
+      resultCard.className = "result-card state-empty";
+      return;
+    }
+
+    resultCard.className = "result-card state-loading";
+
+    try {
+      const response = await fetch(`/api/search/${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      if (data.found) {
+        const med = data.medication;
+        resMedName.textContent    = med.generic_name;
+        resSentence.textContent   = sentenceForRiskLevel(med);
+        resConfidence.textContent = `Based on: ${med.risk_level}`;
+        resSource.innerHTML       = `Source: <a href="${med.source_url}" target="_blank" rel="noopener">NIH LactMed</a>`;
+        resultCard.className = "result-card state-result";
+      } else {
+        resultCard.className = "result-card state-notfound";
+      }
+    } catch (err) {
+      console.error("Search request failed:", err);
+      resultCard.className = "result-card state-notfound";
+    }
+  }
+
+  // Debounce typing slightly so we're not firing a request on every keystroke.
+  let debounceTimer;
+  searchInput.addEventListener("input", (event) => {
+    clearTimeout(debounceTimer);
+    const value = event.target.value;
+    debounceTimer = setTimeout(() => showMedication(value), 250);
+  });
+
+  populatePills();
+</script>
+
+</body>
+</html>

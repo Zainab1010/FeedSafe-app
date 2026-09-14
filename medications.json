@@ -1,0 +1,112 @@
+[
+  {
+    "generic_name": "Ibuprofen",
+    "brand_names": ["Advil", "Motrin"],
+    "drug_class": "Analgesics / NSAIDs",
+    "lactmed_summary": "Ibuprofen reaches breastmilk in extremely low amounts and has a short half-life. It is considered a preferred pain reliever and anti-inflammatory for nursing mothers.",
+    "risk_level": "Minimal Risk",
+    "alternatives": ["Acetaminophen", "Celecoxib"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK500986/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Acetaminophen",
+    "brand_names": ["Tylenol"],
+    "drug_class": "Analgesics",
+    "lactmed_summary": "Acetaminophen produces amounts in milk far below typical infant dosing and is considered a good choice for pain relief and fever reduction while breastfeeding. Adverse effects in breastfed infants are rare.",
+    "risk_level": "Minimal Risk",
+    "alternatives": ["Ibuprofen"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501194/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Amoxicillin",
+    "brand_names": ["Amoxil"],
+    "drug_class": "Antibiotics / Penicillins",
+    "lactmed_summary": "Amoxicillin produces low levels in breastmilk that are not expected to cause adverse effects. Occasional infant rash or gut flora disruption (diarrhea, thrush) has been reported but is not well studied. Considered acceptable during breastfeeding.",
+    "risk_level": "Minimal Risk",
+    "alternatives": ["Ampicillin"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK500887/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Caffeine",
+    "brand_names": ["Coffee", "Energy drinks"],
+    "drug_class": "Stimulants",
+    "lactmed_summary": "Caffeine passes into breastmilk quickly. Moderate intake (roughly up to 300 mg/day, about 2-3 cups of coffee) has not been linked to stimulation in infants older than 3 weeks. Very high intake (10+ cups/day) has been linked to infant fussiness, jitteriness, and poor sleep. Preterm and newborn infants metabolize caffeine much more slowly, so lower intake is advised for their mothers.",
+    "risk_level": "Infant Monitoring Advised (dose-dependent)",
+    "alternatives": ["Decaffeinated coffee or tea"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501467/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Sertraline",
+    "brand_names": ["Zoloft"],
+    "drug_class": "Antidepressants / SSRIs",
+    "lactmed_summary": "Most authoritative reviewers consider sertraline a preferred antidepressant during breastfeeding. Milk levels are low and the drug is usually undetectable in infant serum. No adverse developmental effects have been found in infants followed up to 5 years of age.",
+    "risk_level": "Minimal Risk",
+    "alternatives": ["Escitalopram", "Paroxetine"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501191/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Escitalopram",
+    "brand_names": ["Lexapro"],
+    "drug_class": "Antidepressants / SSRIs",
+    "lactmed_summary": "Maternal doses up to 20 mg daily produce low milk levels and would not be expected to cause adverse effects, especially in infants older than 2 months. Not a reason to discontinue breastfeeding.",
+    "risk_level": "Minimal Risk",
+    "alternatives": ["Sertraline", "Paroxetine"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501275/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Paroxetine",
+    "brand_names": ["Paxil"],
+    "drug_class": "Antidepressants / SSRIs",
+    "lactmed_summary": "Low levels in breastmilk mean paroxetine usually isn't detectable in infant serum. Occasional mild side effects have been reported, mainly when the drug was also used late in pregnancy. No adverse developmental effects found up to age 5.",
+    "risk_level": "Minimal Risk",
+    "alternatives": ["Sertraline", "Escitalopram"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501190/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Venlafaxine",
+    "brand_names": ["Effexor"],
+    "drug_class": "Antidepressants / SNRIs",
+    "lactmed_summary": "Venlafaxine and its active metabolite pass into breastmilk, and the metabolite is detectable in most breastfed infants' blood. Concurrent side effects, however, are rarely reported.",
+    "risk_level": "Infant Monitoring Advised",
+    "alternatives": ["Sertraline", "Escitalopram"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501192/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Duloxetine",
+    "brand_names": ["Cymbalta"],
+    "drug_class": "Antidepressants / SNRIs",
+    "lactmed_summary": "Published data are limited; milk levels appear low and the two infants studied had low serum levels. Not a reason to discontinue breastfeeding, but a better-studied alternative may be preferred, especially for newborn or preterm infants.",
+    "risk_level": "Infant Monitoring Advised",
+    "alternatives": ["Sertraline", "Escitalopram"],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501470/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Lamotrigine",
+    "brand_names": ["Lamictal"],
+    "drug_class": "Anticonvulsants / Mood Stabilizers",
+    "lactmed_summary": "Breastfeeding during lamotrigine monotherapy generally does not appear to adversely affect infant growth or development, but occasional adverse reactions (apnea, rash, drowsiness, poor sucking) have been reported. Infants should be monitored, especially at higher maternal doses; if a rash occurs, breastfeeding should pause until the cause is confirmed.",
+    "risk_level": "Infant Monitoring Advised",
+    "alternatives": [],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501268/",
+    "last_reviewed": "2026-09-15"
+  },
+  {
+    "generic_name": "Metformin",
+    "brand_names": ["Glucophage"],
+    "drug_class": "Antidiabetics",
+    "lactmed_summary": "Metformin levels in milk are low — infants receive well under 1% of the mother's weight-adjusted dose — and a large study found no adverse effects in breastfed infants. Caution is still advised for newborn, preterm, or renally-impaired infants.",
+    "risk_level": "Minimal Risk (caution for newborn/preterm infants)",
+    "alternatives": [],
+    "source_url": "https://www.ncbi.nlm.nih.gov/books/NBK501020/",
+    "last_reviewed": "2026-09-15"
+  }
+]
